@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мой Flask проект</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="{{ url_for('static', filename='quill/quill.snow.css') }}" rel="stylesheet" />
+</head>
+<body>
+
+    <div class="container">
+        <!-- Боковое меню со списком локальных файлов -->
+        <div class="sidebar">
+            <h3>Файлы базы знаний</h3>
+            <button onclick="createNewFile()">+ Новый документ</button>
+            <ul id="file-list">
+                {% for file in files %}
+                    <li><a href="#" onclick="loadFile('{{ file }}')">{{ file }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Область редактирования -->
+        <main class="editor-area">
+            <div class="toolbar-actions">
+                <input type="text" id="doc-title" placeholder="Имя файла (например, note1.html)">
+                <button id="save-btn" onclick="saveCurrentFile()">Сохранить файл</button>
+            </div>
+
+            <!-- Контейнер для Quill.js -->
+            <div id="editor"></div>
+        </main>
+    </div>
+
+    <!-- Подключаем Quill.js и главный логический скрипт -->
+    <script src="{{ url_for('static', filename='quill/quill.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
