@@ -1,0 +1,377 @@
+/* ==========================================================================
+   База знаний — Стили на основе UI/UX макета (Quill.js + Flask)
+   ========================================================================== */
+
+:root {
+    /* Палитра из макета */
+    --bg-main: #f4f5f8;
+    --bg-card: #ffffff;
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --primary-light: #eef2ff;
+    --primary-border: #6366f1;
+    --dark-btn: #0f172a;
+    --dark-btn-hover: #1e293b;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --border-color: #e2e8f0;
+    --status-green: #10b981;
+    --status-green-bg: #ecfdf5;
+
+    /* Шрифты и скругления */
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.05);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    line-height: 1.5;
+    min-height: 100vh;
+}
+
+/* --- Top Bar (Шапка) --- */
+.topbar {
+    background-color: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-icon {
+    width: 36px;
+    height: 36px;
+    background-color: var(--primary);
+    color: #ffffff;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.brand-title {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--status-green-bg);
+    color: var(--status-green);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.status-badge::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    background-color: var(--status-green);
+    border-radius: 50%;
+}
+
+/* Центральный поиск */
+.topbar-search {
+    flex: 1;
+    max-width: 480px;
+    position: relative;
+}
+
+.topbar-search input {
+    width: 100%;
+    padding: 10px 16px 10px 40px;
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.topbar-search input:focus {
+    background-color: #ffffff;
+    border-color: var(--primary-border);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.topbar-search .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: #ffffff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+/* --- Layout --- */
+.main-container {
+    display: flex;
+    gap: 24px;
+    padding: 24px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* --- Sidebar (Список документов) --- */
+.sidebar {
+    width: 320px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    height: 18px;
+    line-height: 18px;
+    margin-bottom: 10px; /* Отступ от заголовка до первого файла */
+}
+
+.file-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.file-item {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    box-shadow: var(--shadow-sm);
+}
+
+.file-item:hover {
+    border-color: #cbd5e1;
+    box-shadow: var(--shadow-md);
+}
+
+/* Активный выбранный документ */
+.file-item.active {
+    background-color: var(--primary-light);
+    border: 1.5px solid var(--primary-border);
+}
+
+.file-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.file-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.file-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    background-color: #f1f5f9;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.file-item.active .file-icon {
+    background-color: var(--primary);
+    color: #ffffff;
+}
+
+.file-name {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.active-badge {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--primary);
+    background-color: rgba(99, 102, 241, 0.12);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.file-snippet {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+/* --- Editor Area --- */
+.editor-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+    /* 18px (высота .sidebar-title) + 10px (margin-bottom) = 28px */
+    margin-top: 28px; 
+}
+
+.doc-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-danger {
+    background-color: #ef4444;
+    color: #ffffff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+}
+
+.doc-header-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    box-shadow: var(--shadow-sm);
+}
+
+.doc-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.doc-icon {
+    font-size: 20px;
+    color: var(--primary);
+}
+
+.doc-title-input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    background: transparent;
+}
+
+.btn-dark {
+    background-color: var(--dark-btn);
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-dark:hover {
+    background-color: var(--dark-btn-hover);
+}
+
+/* Карточка редактора Quill */
+.editor-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.ql-toolbar.ql-snow {
+    border: none !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    background-color: #fafafa;
+    padding: 12px 16px !important;
+}
+
+.ql-container.ql-snow {
+    border: none !important;
+    font-family: var(--font-family) !important;
+    font-size: 15px !important;
+    min-height: 520px;
+}
+
+.ql-editor {
+    padding: 24px 32px !important;
+    min-height: 520px;
+    line-height: 1.7;
+}

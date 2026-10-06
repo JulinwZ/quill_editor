@@ -1,5 +1,5 @@
 import os
-import re  # Добавляем модуль re для очистки HTML-тегов при поиске
+import re
 from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
@@ -40,7 +40,20 @@ def save_file():
     return jsonify({'message': 'Файл сохранен', 'filename': filename})
 
 
-# --- НОВЫЙ ЭНДПОИНТ ПОИСКА ---
+# --- НОВЫЙ ЭНДПОИНТ ДЛЯ УДАЛЕНИЯ ФАЙЛА ---
+@app.route('/api/delete/<filename>', methods=['DELETE'])
+def delete_file(filename):
+    file_path = os.path.join(STORAGE_DIR, filename)
+    if not os.path.exists(file_path):
+        return jsonify({'error': 'Файл не найден'}), 404
+
+    try:
+        os.remove(file_path)
+        return jsonify({'message': 'Файл успешно удален', 'filename': filename})
+    except Exception as e:
+        return jsonify({'error': f'Ошибка при удалении файла: {str(e)}'}), 500
+
+
 @app.route('/api/search', methods=['GET'])
 def search_files():
     query = request.args.get('q', '').strip().lower()
@@ -53,7 +66,6 @@ def search_files():
     for filename in files:
         file_path = os.path.join(STORAGE_DIR, filename)
 
-        # 1. Поиск по имени файла
         title_match = query in filename.lower()
         content_match = False
         snippet = ""
@@ -62,11 +74,9 @@ def search_files():
             with open(file_path, 'r', encoding='utf-8') as f:
                 raw_content = f.read()
 
-            # Удаляем HTML-теги для корректного поиска по тексту
             clean_text = re.sub(r'<[^>]+>', ' ', raw_content)
             clean_text_lower = clean_text.lower()
 
-            # 2. Поиск по тексту файла
             if query in clean_text_lower:
                 content_match = True
                 idx = clean_text_lower.find(query)

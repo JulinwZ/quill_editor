@@ -2,41 +2,81 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Мой Flask проект</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Файлы базы знаний</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='quill/quill.snow.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="{{ url_for('static', filename='quill/quill.snow.css') }}" rel="stylesheet" />
 </head>
 <body>
 
-    <div class="container">
-        <!-- Боковое меню со списком локальных файлов -->
-        <div class="sidebar">
-            <h3>Файлы базы знаний</h3>
-            
-            <!-- Поле поиска (без стилей) -->
-            <input type="text" id="search-input" placeholder="Поиск..." oninput="handleSearch()">
-            
-            <button onclick="createNewFile()">+ Новый документ</button>
-            <ul id="file-list">
-                {% for file in files %}
-                    <li><a href="#" onclick="loadFile('{{ file }}')">{{ file }}</a></li>
-                {% endfor %}
-            </ul>
+    <!-- Верхняя шапка -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <div class="brand-icon">📑</div>
+            <h1 class="brand-title">Файлы базы знаний</h1>
+            <span class="status-badge">Локально</span>
         </div>
 
-        <!-- Область редактирования -->
+        <div class="topbar-search">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-input" placeholder="Быстрый поиск по базе знаний..." oninput="handleSearch()">
+        </div>
+
+        <div class="topbar-right">
+            <button class="btn-primary" onclick="createNewFile()">
+                <span>+</span> Новый документ
+            </button>
+        </div>
+    </header>
+
+    <!-- Главный контейнер -->
+    <div class="main-container">
+
+        <!-- Левая колонка со списком файлов -->
+        <aside class="sidebar">
+            <span class="sidebar-title">Документы</span>
+
+            <ul id="file-list" class="file-list">
+                {% for file in files %}
+                    <li class="file-item" onclick="loadFile('{{ file }}', this)">
+                        <div class="file-item-header">
+                            <div class="file-title-group">
+                                <span class="file-icon">📄</span>
+                                <span class="file-name">{{ file }}</span>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </aside>
+
+        <!-- Правая колонка с редактором -->
         <main class="editor-area">
-            <div class="toolbar-actions">
-                <input type="text" id="doc-title" placeholder="Имя файла (например, note1.html)">
-                <button id="save-btn" onclick="saveCurrentFile()">Сохранить файл</button>
+
+            <div class="doc-header-card">
+                <div class="doc-title-wrapper">
+                    <span class="doc-icon">📄</span>
+                    <input type="text" id="doc-title" class="doc-title-input" placeholder="Название файла (например, note1.html)">
+                </div>
+
+                <div class="doc-actions">
+                    <button id="delete-btn" class="btn-danger" onclick="deleteCurrentFile()">
+                        <span>🗑️</span> Удалить
+                    </button>
+                    <button id="save-btn" class="btn-dark" onclick="saveCurrentFile()">
+                        <span>✓</span> Сохранить
+                    </button>
+                </div>
             </div>
 
-            <!-- Контейнер для Quill.js -->
-            <div id="editor"></div>
+            <div class="editor-card">
+                <div id="editor"></div>
+            </div>
+
         </main>
     </div>
 
-    <!-- Подключаем Quill.js и главный логический скрипт -->
     <script src="{{ url_for('static', filename='quill/quill.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>

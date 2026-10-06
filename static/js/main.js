@@ -1,23 +1,25 @@
-// Инициализируем Quill.js
 const quill = new Quill('#editor', {
-    theme: 'snow'
+    theme: 'snow',
+    placeholder: 'Нажмите сюда для ввода текста документа...'
 });
 
-// Загрузка содержимого файла в редактор
+let currentOpenedFile = null;
+
 async function loadFile(filename) {
-    const response = await fetch(`/api/load/${filename}`);
+    const response = await fetch(`/api/load/${encodeURIComponent(filename)}`);
     if (response.ok) {
         const data = await response.json();
         document.getElementById('doc-title').value = data.filename;
         
-        // Вставляем полученный HTML напрямую в редактор
         quill.clipboard.dangerouslyPasteHTML(data.content);
+        currentOpenedFile = data.filename;
+
+        updateActiveFileHighlight(filename);
     } else {
         alert('Ошибка при чтении файла');
     }
 }
 
-// Отправка отредактированного текста на Flask
 async function saveCurrentFile() {
     const filename = document.getElementById('doc-title').value.trim();
     if (!filename) {
@@ -25,7 +27,6 @@ async function saveCurrentFile() {
         return;
     }
 
-    // Извлекаем чистый HTML-код из Quill.js
     const htmlContent = quill.getSemanticHTML();
 
     const response = await fetch('/api/save', {
@@ -45,12 +46,62 @@ async function saveCurrentFile() {
     }
 }
 
+// Удаление выбранного файла
+async function deleteCurrentFile() {
+    const filename = document.getElementById('doc-title').value.trim();
+    if (!filename) {
+        alert('Выберите файл для удаления');
+        return;
+    }
+
+    if (!confirm(`Вы действительно хотите удалить файл "${filename}"?`)) {
+        return;
+    }
+
+    const response = await fetch(`/api/delete/${encodeURIComponent(filename)}`, {
+        method: 'DELETE'
+    });
+
+    if (response.ok) {
+        alert('Файл успешно удален!');
+        createNewFile();
+        location.reload();
+    } else {
+        const data = await response.json();
+        alert(data.error || 'Ошибка при удалении файла');
+    }
+}
+
 function createNewFile() {
     document.getElementById('doc-title').value = '';
     quill.setText('');
+    currentOpenedFile = null;
+    document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active'));
 }
 
-// --- ЛОГИКА ПОИСКА ---
+function updateActiveFileHighlight(filename) {
+    document.querySelectorAll('.file-item').forEach(el => {
+        const nameText = el.querySelector('.file-name')?.textContent.trim();
+        if (nameText === filename) {
+            el.classList.add('active');
+            if (!el.querySelector('.active-badge')) {
+                const header = el.querySelector('.file-item-header');
+                if (header) {
+                    const badge = document.createElement('span');
+                    badge.className = 'active-badge';
+                    badge.textContent = 'ОТКРЫТ';
+                    header.appendChild(badge);
+                }
+            }
+        } else {
+            el.classList.remove('active');
+            const badge = el.querySelector('.active-badge');
+            if (badge) badge.remove();
+        }
+    });
+}
+
+// Поиск по файлам
 let searchTimeout = null;
 
 function handleSearch() {
@@ -60,7 +111,6 @@ function handleSearch() {
         const query = document.getElementById('search-input').value.trim();
         const fileListContainer = document.getElementById('file-list');
 
-        // Если поле поиска пустое, перезагружаем страницу для отображения всех файлов
         if (!query) {
             location.reload();
             return;
@@ -72,17 +122,25 @@ function handleSearch() {
             fileListContainer.innerHTML = '';
 
             if (results.length === 0) {
-                fileListContainer.innerHTML = '<li>Ничего не найдено</li>';
+                fileListContainer.innerHTML = '<li class="file-item"><span class="file-snippet">Ничего не найдено</span></li>';
                 return;
             }
 
             results.forEach(item => {
                 const li = document.createElement('li');
+                const isActive = item.filename === currentOpenedFile;
+                li.className = `file-item ${isActive ? 'active' : ''}`;
+                li.onclick = () => loadFile(item.filename);
+
                 li.innerHTML = `
-                    <a href="#" onclick="loadFile('${item.filename}')">
-                        <strong>${item.filename}</strong><br>
-                        <small>${item.snippet}</small>
-                    </a>
+                    <div class="file-item-header">
+                        <div class="file-title-group">
+                            <span class="file-icon">📄</span>
+                            <span class="file-name">${item.filename}</span>
+                        </div>
+                        ${isActive ? '<span class="active-badge">ОТКРЫТ</span>' : ''}
+                    </div>
+                    ${item.snippet ? `<div class="file-snippet">\${item.snippet}</div>` : ''}
                 `;
                 fileListContainer.appendChild(li);
             });
