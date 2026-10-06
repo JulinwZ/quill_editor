@@ -1,6 +1,16 @@
 const quill = new Quill('#editor', {
     theme: 'snow',
-    placeholder: 'Нажмите сюда для ввода текста документа...'
+    placeholder: 'Нажмите сюда для ввода текста документа...',
+    modules: {
+        toolbar: [
+            [{ 'header': [1, 2, 3, false] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            // Добавляем { 'list': 'check' } рядом с обычными списками
+            [{ 'list': 'ordered'}, { 'list': 'bullet'}, { 'list': 'check' }],
+            [{ 'color': [] }, { 'background': [] }],
+            ['clean']
+        ]
+    }
 });
 
 let currentOpenedFile = null;
