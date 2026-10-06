@@ -24,6 +24,9 @@
         </div>
 
         <div class="topbar-right">
+            <button class="btn-secondary" onclick="openFolderModal()" style="margin-right: 8px;">
+                <span>📁</span> + Папка
+            </button>
             <button class="btn-primary" onclick="createNewFile()">
                 <span>+</span> Новый документ
             </button>
@@ -33,22 +36,13 @@
     <!-- Главный контейнер -->
     <div class="main-container">
 
-        <!-- Левая колонка со списком файлов -->
+        <!-- Левая колонка со списком файлов и папок -->
         <aside class="sidebar">
-            <span class="sidebar-title">Документы</span>
+            <span class="sidebar-title">Структура Storage</span>
 
-            <ul id="file-list" class="file-list">
-                {% for file in files %}
-                    <li class="file-item" onclick="loadFile('{{ file.display_name }}')">
-                        <div class="file-item-header">
-                            <div class="file-title-group">
-                                <span class="file-icon">📄</span>
-                                <span class="file-name">{{ file.display_name }}</span>
-                            </div>
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
+            <div id="file-tree" class="file-tree">
+                <!-- Дерево папок и файлов генерируется динамически через JS -->
+            </div>
         </aside>
 
         <!-- Правая колонка с редактором -->
@@ -57,14 +51,12 @@
             <div class="doc-header-card">
                 <div class="doc-title-wrapper">
                     <span class="doc-icon">📄</span>
-                    <input type="text" id="doc-title" class="doc-title-input" placeholder="Название файла (например, Моя заметка)" oninput="triggerAutosave()">
+                    <input type="text" id="doc-title" class="doc-title-input" placeholder="Путь к файлу (например, Проекты/Моя заметка)" oninput="triggerAutosave()">
                 </div>
 
                 <div class="doc-actions">
-                    <!-- Статус автосохранения (скрыт для новых файлов) -->
                     <span id="save-status" class="save-status saved" style="display: none;">Все изменения сохранены</span>
 
-                    <!-- Кнопка первоначального сохранения (видна только для новых файлов) -->
                     <button id="save-btn" class="btn-dark" onclick="manualSaveFile()">
                         <span>✓</span> Сохранить
                     </button>
@@ -83,6 +75,24 @@
             </div>
 
         </main>
+    </div>
+
+    <!-- Модальное окно создания папки -->
+    <div id="folder-modal" class="modal-overlay" onclick="closeFolderModalOnBackdrop(event)">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Новая папка</h3>
+                <button class="modal-close-btn" onclick="closeFolderModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <label for="modal-folder-name" class="modal-label">Название директории</label>
+                <input type="text" id="modal-folder-name" class="modal-input" placeholder="например, Проекты" onkeydown="handleModalKeyDown(event)">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeFolderModal()">Отмена</button>
+                <button class="btn-primary" onclick="submitNewFolder()">Создать папку</button>
+            </div>
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='quill/quill.js') }}"></script>
