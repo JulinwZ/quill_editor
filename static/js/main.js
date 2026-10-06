@@ -157,3 +157,14 @@ function handleSearch() {
         }
     }, 300);
 }
+
+function exportDocx() {
+    const filename = document.getElementById('doc-title').value.trim();
+    if (!filename) {
+        alert('Выберите или сохраните файл перед экспортом');
+        return;
+    }
+
+    // Инициируем скачивание с сервера
+    window.location.href = `/api/export/docx/${encodeURIComponent(filename)}`;
+}

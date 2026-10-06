@@ -1,6 +1,9 @@
 import os
 import re
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
+import io
+from docx import Document
+from htmldocx import HtmlToDocx
 
 app = Flask(__name__)
 
@@ -95,6 +98,37 @@ def search_files():
 
     return jsonify(results)
 
+@app.route('/api/export/docx/<filename>', methods=['GET'])
+def export_docx(filename):
+    file_path = os.path.join(STORAGE_DIR, filename)
+    if not os.path.exists(file_path):
+        return jsonify({'error': 'Файл не найден'}), 404
+
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            html_content = f.read()
+
+        # Создаем DOCX документ в памяти
+        doc = Document()
+        new_parser = HtmlToDocx()
+        new_parser.add_html_to_document(html_content, doc)
+
+        # Сохраняем результат в файловый поток BytesIO (без засорения диска временными файлами)
+        file_stream = io.BytesIO()
+        doc.save(file_stream)
+        file_stream.seek(0)
+
+        # Вырезаем расширение .html / .txt для красивого названия экспортируемого файла
+        base_name = os.path.splitext(filename)[0]
+
+        return send_file(
+            file_stream,
+            as_attachment=True,
+            download_name=f"{base_name}.docx",
+            mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        )
+    except Exception as e:
+        return jsonify({'error': f'Ошибка при конвертации в DOCX: {str(e)}'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
