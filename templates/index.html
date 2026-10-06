@@ -12,6 +12,10 @@
         <!-- Боковое меню со списком локальных файлов -->
         <div class="sidebar">
             <h3>Файлы базы знаний</h3>
+            
+            <!-- Поле поиска (без стилей) -->
+            <input type="text" id="search-input" placeholder="Поиск..." oninput="handleSearch()">
+            
             <button onclick="createNewFile()">+ Новый документ</button>
             <ul id="file-list">
                 {% for file in files %}

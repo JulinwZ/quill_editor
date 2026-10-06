@@ -49,3 +49,43 @@ function createNewFile() {
     document.getElementById('doc-title').value = '';
     quill.setText('');
 }
+
+// --- ЛОГИКА ПОИСКА ---
+let searchTimeout = null;
+
+function handleSearch() {
+    clearTimeout(searchTimeout);
+
+    searchTimeout = setTimeout(async () => {
+        const query = document.getElementById('search-input').value.trim();
+        const fileListContainer = document.getElementById('file-list');
+
+        // Если поле поиска пустое, перезагружаем страницу для отображения всех файлов
+        if (!query) {
+            location.reload();
+            return;
+        }
+
+        const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+        if (response.ok) {
+            const results = await response.json();
+            fileListContainer.innerHTML = '';
+
+            if (results.length === 0) {
+                fileListContainer.innerHTML = '<li>Ничего не найдено</li>';
+                return;
+            }
+
+            results.forEach(item => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <a href="#" onclick="loadFile('${item.filename}')">
+                        <strong>${item.filename}</strong><br>
+                        <small>${item.snippet}</small>
+                    </a>
+                `;
+                fileListContainer.appendChild(li);
+            });
+        }
+    }, 300);
+}
