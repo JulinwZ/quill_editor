@@ -2,3 +2,5 @@
 venv
 test.py
 storage
+result.txt
+script.ps1

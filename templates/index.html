@@ -39,11 +39,11 @@
 
             <ul id="file-list" class="file-list">
                 {% for file in files %}
-                    <li class="file-item" onclick="loadFile('{{ file }}', this)">
+                    <li class="file-item" onclick="loadFile('{{ file.display_name }}')">
                         <div class="file-item-header">
                             <div class="file-title-group">
                                 <span class="file-icon">📄</span>
-                                <span class="file-name">{{ file }}</span>
+                                <span class="file-name">{{ file.display_name }}</span>
                             </div>
                         </div>
                     </li>
@@ -57,20 +57,24 @@
             <div class="doc-header-card">
                 <div class="doc-title-wrapper">
                     <span class="doc-icon">📄</span>
-                    <input type="text" id="doc-title" class="doc-title-input" placeholder="Название файла (например, note1.html)">
+                    <input type="text" id="doc-title" class="doc-title-input" placeholder="Название файла (например, Моя заметка)" oninput="triggerAutosave()">
                 </div>
 
                 <div class="doc-actions">
+                    <!-- Статус автосохранения (скрыт для новых файлов) -->
+                    <span id="save-status" class="save-status saved" style="display: none;">Все изменения сохранены</span>
+
+                    <!-- Кнопка первоначального сохранения (видна только для новых файлов) -->
+                    <button id="save-btn" class="btn-dark" onclick="manualSaveFile()">
+                        <span>✓</span> Сохранить
+                    </button>
+
                     <button id="export-btn" class="btn-secondary" onclick="exportDocx()">
                         <span>📥</span> DOCX
                     </button>
                     <button id="delete-btn" class="btn-danger" onclick="deleteCurrentFile()">
                         <span>🗑️</span> Удалить
                     </button>
-                    <button id="save-btn" class="btn-dark" onclick="saveCurrentFile()">
-                        <span>✓</span> Сохранить
-                    </button>
-                    
                 </div>
             </div>
 

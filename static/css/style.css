@@ -1,9 +1,8 @@
 /* ==========================================================================
-   База знаний — Стили на основе UI/UX макета (Quill.js + Flask)
+   База знаний — Фиксированный Viewport с независимым скроллом
    ========================================================================== */
 
 :root {
-    /* Палитра из макета */
     --bg-main: #f4f5f8;
     --bg-card: #ffffff;
     --primary: #4f46e5;
@@ -19,7 +18,6 @@
     --status-green: #10b981;
     --status-green-bg: #ecfdf5;
 
-    /* Шрифты и скругления */
     --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     --radius-sm: 8px;
     --radius-md: 12px;
@@ -33,15 +31,41 @@
     padding: 0;
 }
 
+/* Фиксируем окно без общей прокрутки страницы */
+html, body {
+    height: 100vh;
+    overflow: hidden;
+}
+
 body {
     font-family: var(--font-family);
     background-color: var(--bg-main);
     color: var(--text-primary);
     line-height: 1.5;
-    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-/* --- Top Bar (Шапка) --- */
+/* --- Тонкий современный скроллбар --- */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* --- Top Bar (Зафиксированная шапка) --- */
 .topbar {
     background-color: var(--bg-card);
     border-bottom: 1px solid var(--border-color);
@@ -50,8 +74,7 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: 20px;
-    position: sticky;
-    top: 0;
+    flex-shrink: 0;
     z-index: 100;
 }
 
@@ -98,7 +121,6 @@ body {
     border-radius: 50%;
 }
 
-/* Центральный поиск */
 .topbar-search {
     flex: 1;
     max-width: 480px;
@@ -149,21 +171,25 @@ body {
     background-color: var(--primary-hover);
 }
 
-/* --- Layout --- */
+/* --- Главная рабочая область на всю оставшуюся высоту --- */
 .main-container {
+    flex: 1;
     display: flex;
     gap: 24px;
-    padding: 24px;
+    padding: 20px 24px 24px 24px;
     max-width: 1600px;
+    width: 100%;
     margin: 0 auto;
+    overflow: hidden;
 }
 
-/* --- Sidebar (Список документов) --- */
+/* --- Сайдбар с собственным скроллом списка --- */
 .sidebar {
     width: 320px;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
+    height: 100%;
 }
 
 .sidebar-title {
@@ -174,7 +200,8 @@ body {
     color: var(--text-secondary);
     height: 18px;
     line-height: 18px;
-    margin-bottom: 10px; /* Отступ от заголовка до первого файла */
+    margin-bottom: 12px;
+    flex-shrink: 0;
 }
 
 .file-list {
@@ -182,6 +209,9 @@ body {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 6px; /* Небольшой отступ под красивый скроллбар */
 }
 
 .file-item {
@@ -202,7 +232,6 @@ body {
     box-shadow: var(--shadow-md);
 }
 
-/* Активный выбранный документ */
 .file-item.active {
     background-color: var(--primary-light);
     border: 1.5px solid var(--primary-border);
@@ -258,40 +287,15 @@ body {
     line-height: 1.4;
 }
 
-/* --- Editor Area --- */
+/* --- Область редактора с скроллом только внутри текста --- */
 .editor-area {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 16px;
     min-width: 0;
-    /* 18px (высота .sidebar-title) + 10px (margin-bottom) = 28px */
-    margin-top: 28px; 
-}
-
-.doc-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.btn-danger {
-    background-color: #ef4444;
-    color: #ffffff;
-    border: none;
-    padding: 10px 18px;
-    border-radius: var(--radius-md);
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: background-color 0.2s ease;
-}
-
-.btn-danger:hover {
-    background-color: #dc2626;
+    height: 100%;
+    padding-top: 30px; /* Сохраняет идеальное выравнивание с первым файлом */
 }
 
 .doc-header-card {
@@ -304,6 +308,7 @@ body {
     justify-content: space-between;
     gap: 16px;
     box-shadow: var(--shadow-sm);
+    flex-shrink: 0;
 }
 
 .doc-title-wrapper {
@@ -328,6 +333,52 @@ body {
     background: transparent;
 }
 
+.doc-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.save-status {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.save-status.saved {
+    color: var(--text-secondary);
+    background-color: #f1f5f9;
+}
+
+.save-status.saving {
+    color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+.save-status.error {
+    color: #ef4444;
+    background-color: #fef2f2;
+}
+
+.save-status.saving::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    background-color: var(--primary);
+    border-radius: 50%;
+    animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.3; }
+    100% { opacity: 1; }
+}
+
 .btn-dark {
     background-color: var(--dark-btn);
     color: #ffffff;
@@ -345,35 +396,6 @@ body {
 
 .btn-dark:hover {
     background-color: var(--dark-btn-hover);
-}
-
-/* Карточка редактора Quill */
-.editor-card {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    overflow: hidden;
-}
-
-.ql-toolbar.ql-snow {
-    border: none !important;
-    border-bottom: 1px solid var(--border-color) !important;
-    background-color: #fafafa;
-    padding: 12px 16px !important;
-}
-
-.ql-container.ql-snow {
-    border: none !important;
-    font-family: var(--font-family) !important;
-    font-size: 15px !important;
-    min-height: 520px;
-}
-
-.ql-editor {
-    padding: 24px 32px !important;
-    min-height: 520px;
-    line-height: 1.7;
 }
 
 .btn-secondary {
@@ -394,4 +416,62 @@ body {
 .btn-secondary:hover {
     background-color: #e2e8f0;
     border-color: #cbd5e1;
+}
+
+.btn-danger {
+    background-color: #ef4444;
+    color: #ffffff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+}
+
+/* Карточка редактора — зафиксирована, скролл только внутри текста */
+.editor-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    min-height: 0; /* Обязательно для гибкого скролла во flex-контейнере */
+}
+
+.ql-toolbar.ql-snow {
+    flex-shrink: 0;
+    border: none !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    background-color: #fafafa;
+    padding: 12px 16px !important;
+}
+
+.ql-container.ql-snow {
+    flex: 1;
+    border: none !important;
+    font-family: var(--font-family) !important;
+    font-size: 15px !important;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.ql-editor {
+    flex: 1;
+    padding: 24px 32px !important;
+    overflow-y: auto !important;
+    line-height: 1.7;
 }
