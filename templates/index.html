@@ -10,38 +10,51 @@
 </head>
 <body>
 
-    <!-- Верхняя шапка -->
+        <!-- Верхняя шапка -->
+        <!-- Верхняя шапка без строки поиска -->
     <header class="topbar">
         <div class="topbar-left">
             <div class="brand-icon">📑</div>
             <h1 class="brand-title">Файлы базы знаний</h1>
             <span class="status-badge">Локально</span>
         </div>
-
-        <div class="topbar-search">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="search-input" placeholder="Быстрый поиск по базе знаний..." oninput="handleSearch()">
-        </div>
-
-        <div class="topbar-right">
-            <button class="btn-secondary" onclick="openFolderModal()" style="margin-right: 8px;">
-                <span>📁</span> + Папка
-            </button>
-            <button class="btn-primary" onclick="createNewFile()">
-                <span>+</span> Новый документ
-            </button>
-        </div>
     </header>
 
     <!-- Главный контейнер -->
     <div class="main-container">
 
-        <!-- Левая колонка со списком файлов и папок -->
+        <!-- Левая боковая панель -->
         <aside class="sidebar">
             <span class="sidebar-title">Структура Storage</span>
 
+            <!-- Перенесенная строка поиска -->
+            <div class="sidebar-search">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-input" placeholder="Быстрый поиск..." oninput="handleSearch()">
+            </div>
+
+            <!-- Кнопка "+ Create" с выпадающим меню по образцу -->
+            <div class="create-dropdown-wrapper">
+                <button class="btn-create-trigger" onclick="toggleCreateMenu(event)">
+                    <span class="plus-icon">+</span>
+                    <span>Создать</span>
+                </button>
+
+                <!-- Карточка с пунктами "Folder" и "Document" -->
+                <div id="create-menu" class="create-menu-card">
+                    <div class="create-menu-item" onclick="openFolderModal(); hideCreateMenu();">
+                        <div class="menu-icon-badge folder-badge">📁</div>
+                        <span class="menu-item-text">Папка</span>
+                    </div>
+                    <div class="create-menu-item" onclick="createNewFile(); hideCreateMenu();">
+                        <div class="menu-icon-badge doc-badge">📄</div>
+                        <span class="menu-item-text">Файл</span>
+                    </div>
+                </div>
+            </div>
+
             <div id="file-tree" class="file-tree">
-                <!-- Дерево папок и файлов генерируется динамически через JS -->
+                <!-- Дерево файлов -->
             </div>
         </aside>
 

@@ -537,3 +537,23 @@ function handleSearch() {
         }
     }, 300);
 }
+
+// --- Логика работы меню Create ---
+function toggleCreateMenu(event) {
+    event.stopPropagation();
+    const menu = document.getElementById('create-menu');
+    if (menu) menu.classList.toggle('active');
+}
+
+function hideCreateMenu() {
+    const menu = document.getElementById('create-menu');
+    if (menu) menu.classList.remove('active');
+}
+
+// Закрытие меню при клике по любому другому месту
+document.addEventListener('click', (e) => {
+    const wrapper = document.querySelector('.create-dropdown-wrapper');
+    if (wrapper && !wrapper.contains(e.target)) {
+        hideCreateMenu();
+    }
+});
